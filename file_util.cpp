@@ -5,6 +5,8 @@
 #include "struct.h"
 // 读用户信息
 bool read_users(USERS *p_users){
+	if (users.length <= 0)						// 如果没有数据，结束 
+		return true;
 	char buffer[DIR_LEN_MAX + 1];				// 栈中申请内存空间，用于存放数据文件的路径，数据文件位于程序的根目录下 
 	if (_getcwd(buffer,DIR_LEN_MAX) == NULL)	// 获得当前程序的路径，函数值非NULL时，执行成功 
 		return false;
@@ -37,8 +39,6 @@ bool read_users(USERS *p_users){
 
 // 写用户信息
 bool write_users(USERS users){
-	if (users.length <= 0)								// 如果没有数据，结束 
-		return true;
 
 	char buffer[DIR_LEN_MAX + 1];						// 在栈中申请内存空间，用于存放数据文件的路径，数据文件位于程序的根目录下 
 	if (_getcwd(buffer,DIR_LEN_MAX) == NULL)			// 获得当前程序的路径，函数值非NULL时，执行成功
