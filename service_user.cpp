@@ -3,7 +3,8 @@
 #include "mapper_user.h"
 #include "service_user.h"
 #include "struct.h"
-bool login(USERS users, USER *p_user) // 用户登录 
+// 用户登录 
+bool login(USERS users, USER *p_user)
 {
 	USER user; // 存放用户实体 
 	int index; // 用户索引位置 
@@ -27,5 +28,34 @@ bool login(USERS users, USER *p_user) // 用户登录
 			return true;
 		}
 
+	}
+}
+
+// 员工入职 
+bool starr_induction(USERS *p_user,USER *p_user)
+{
+	char ch;
+	int result;
+	printf("请输入你的姓名\n");
+	scanf("%s",p_user->name);
+	printf("请输入你的性别( 0 表示女 1 表示男)\n");
+	scanf("%d",p_user->sex); 
+	printf("请输入你的学历\n");
+	scanf("%s",p_user->education);
+	printf("是否要修改密码？(y/n)");
+	scanf("%c",&ch);
+	if (ch == 'y' || ch == 'Y')
+	{
+		printf("请输入新密码：");
+		scanf("%s",p_user.password);
+	}
+	result = update_user(&p_users,*user);
+	if (result == 1)
+	{
+		printf("入职成功！");
+		return true;
+	}else{
+		printf("操作失败！请联系管理员");
+		return false;
 	}
 }

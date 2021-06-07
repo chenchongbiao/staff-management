@@ -11,7 +11,7 @@ int update_user(USERS *p_users,USER user)
     if (index < 0 || index >= p_users->length)
     	return false;
     p_users->users[index] = user;
-	return true; 
+	return 1; 
 }
 //////////////////////////////////²éÕÒÓÃ»§/////////////////////////////////////////////// 
 
