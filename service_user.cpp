@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "mapper_user.h"
 #include "service_user.h"
 #include "struct.h"
 bool login(USERS users, USER *p_user) // ÓÃ»§µÇÂ¼ 
