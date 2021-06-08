@@ -32,6 +32,7 @@ void admin_menu()
     printf("\t\t*     0.退出系统           *\n");
     printf("\t\t*     请选择功能(0-3）     *\n");
     printf("\t\t****************************\n");
+    printf("\t\t");
 }
 
 // 部门经理菜单功能显示
@@ -44,14 +45,13 @@ void manage_menu()
     printf("\t\t****************************\n");
     printf("\t\t*     1.员 工 管 理        *\n");
     printf("\t\t*                          *\n");
-    printf("\t\t*     2.部 门 管 理        *\n");
-    printf("\t\t*                          *\n");
-    printf("\t\t*     3.员 工 查 询 统 计  *\n");
+    printf("\t\t*     2.员 工 查 询 统 计  *\n");
     printf("\t\t*                          *\n");
     printf("\t\t*                          *\n");
     printf("\t\t*     0.退出系统           *\n");
     printf("\t\t*     请选择功能(0-3）     *\n");
     printf("\t\t****************************\n");
+    printf("\t\t");
 }
 
 // 员工个人管理
@@ -70,13 +70,14 @@ void staff_menu(){
     printf("\t\t*     0.返回上一页         *\n");
     printf("\t\t*     请选择功能(0-3）     *\n");
     printf("\t\t****************************\n");
+    printf("\t\t");
 } 
 
 // 员工管理
 void staff_manage_menu(){
 	printf("\t\t****************************\n");
     printf("\t\t*                          *\n");
-    printf("\t\t*     员 工 管  理       *\n");
+    printf("\t\t*     员 工 管  理         *\n");
     printf("\t\t*                          *\n");
     printf("\t\t****************************\n");
     printf("\t\t*     1.添 加 员 工        *\n");
@@ -85,13 +86,14 @@ void staff_manage_menu(){
     printf("\t\t*                          *\n");
     printf("\t\t*     3.修 改 员 工        *\n");
     printf("\t\t*                          *\n");
-    printf("\t\t*     4.修 改 员 工        *\n");
+    printf("\t\t*     4.查 找 员 工        *\n");
     printf("\t\t*                          *\n");
     printf("\t\t*     5.信 息 总 览        *\n");
     printf("\t\t*                          *\n");
     printf("\t\t*     0.返回上一页         *\n");
     printf("\t\t*     请选择功能(0-5）     *\n");
     printf("\t\t****************************\n");
+    printf("\t\t");
 }
 
 
@@ -109,11 +111,14 @@ void depart_manage_menu(){
     printf("\t\t*                          *\n");
     printf("\t\t*     3.修 改 部 门        *\n");
     printf("\t\t*                          *\n");
-    printf("\t\t*     4.部 门 总 览        *\n");
+    printf("\t\t*     4.查 找 部 门        *\n");
+    printf("\t\t*                          *\n");
+    printf("\t\t*     5.部 门 总 览        *\n");
     printf("\t\t*                          *\n");
     printf("\t\t*     0.返回上一页         *\n");
-    printf("\t\t*     请选择功能(0-4）     *\n");
+    printf("\t\t*     请选择功能(0-5）     *\n");
     printf("\t\t****************************\n");
+    printf("\t\t");
 }
 
 // 员工查询统计 
@@ -130,6 +135,7 @@ void total_menu(){
     printf("\t\t*     0.返回上一页         *\n");
     printf("\t\t*     请选择功能(0-2）     *\n");
     printf("\t\t****************************\n");
+    printf("\t\t");
 }  
 
 
@@ -150,4 +156,5 @@ void total_staff(){
     printf("\t\t*     0.返回上一页         *\n");
     printf("\t\t*     请选择功能(0-3）     *\n");
     printf("\t\t****************************\n");
+    printf("\t\t");
 }
