@@ -9,7 +9,7 @@ void show_prelogin_menu(){
     printf("\t\t*     1.登录               *\n");
     printf("\t\t*                          *\n");
     printf("\t\t*     0.退出系统           *\n");
-    printf("\t\t*     请选择功能(0-2）     *\n");
+    printf("\t\t*     请选择功能(0-1）     *\n");
     printf("\t\t****************************\n");
     printf("\t\t");
 }
