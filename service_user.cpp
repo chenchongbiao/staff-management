@@ -3,13 +3,25 @@
 // 用户登录 
 bool login(USERS users, USER *p_user)
 {
-	USER user; // 存放用户实体 
-	int index; // 用户索引位置 
-	
+	USER user; 				// 存放用户实体 
+	int index,i; 			// 用户索引位置 
+	i=0;				    // 接受密码输入的索引位置 
+	char ch;				//接收字符输入 
 	printf("\n\t\tusername:");
 	scanf("%s", p_user->user_name);
 	printf("\n\t\tpassword:");
-	scanf("%s", p_user->password);
+	while((ch=getch())!='\r')
+	{
+		if(ch=='\b' && i > 0)
+		{
+			printf("\b \b");
+			--i;
+		}else if(ch!='\b'){
+			p_user->password[i++]=ch;
+			printf("*");
+		}
+	}
+	p_user->password[i] = '\0';    // 字符串以\0结尾 
 	index = select_user_by_username(users,p_user->user_name);
 	if (index == -1)  
 	{
@@ -39,7 +51,14 @@ bool login(USERS users, USER *p_user)
 bool admin_save_user(USERS *p_users)
 {
 	system("cls");
-	printf("\t\t添加员工\n"); 
+	USER user; // 存放添加员工的数据
+	printf("\t\t请设置用户名:");
+	scanf("%s",user.user_name);
+	printf("\n\t\t请输入姓名:"); 
+	scanf("%s",user.name);
+	printf("\n\t\t请设置权限（0 一般员工 1 部门管理员 2 系统管理员）");
+	scanf("%d",&user.role_id);
+	printf("\n\t\t请设置部门");
 	return true; 
 }
 // 删除员工
