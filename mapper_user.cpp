@@ -1,4 +1,3 @@
-#include <string.h>
 #include "mapper_user.h"
 
 
@@ -27,7 +26,7 @@ int update_user(USERS *p_users,USER user)
 int select_user_by_username(USERS users,char *p_username)
 {
 	int i;
-	for (int = 0; i < users.length; i++)
+	for (i = 0; i < users.length; i++)
 	{
 		if (strcmp(users.users[i].user_name ,p_username) == 0)	// 用户名一致
 		{
