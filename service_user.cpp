@@ -33,7 +33,90 @@ bool login(USERS users, USER *p_user)
 
 	}
 }
+////////////////////////////////////////////////管理员操作///////////////////////////////////////////////// 
 
+////////////////////员工管理部分///////////////////
+
+// 添加员工
+bool admin_save_user(USERS *p_users)
+{
+	system("cls");
+	printf("\t\t添加员工\n"); 
+	return true; 
+}
+// 删除员工
+bool admin_delete_user(USERS *p_users)
+{
+	system("cls");
+	printf("\t\t删除员工\n"); 
+	return true; 
+}
+// 修改员工
+bool admin_udpate_user(USERS *p_users)
+{
+	system("cls");
+	printf("\t\t修改员工\n"); 	
+	return true; 
+}
+// 查找员工
+bool admin_select_user(USERS users)
+{
+	system("cls");
+	printf("\t\t查找员工\n"); 	
+	return true; 
+}
+// 信息总览 
+bool staff_info(USERS users)
+{
+	system("cls");
+	printf("\t\t信息总览\n"); 
+	return true; 	
+}
+
+////////////////////部门管理部分///////////////////
+// 添加部门 
+bool admin_save_dapart(DEPARTMENTS *p_dprts)
+{
+	system("cls");
+	printf("\t\t添加部门 \n"); 
+	return true; 
+}
+// 删除部门 
+bool admin_delete_dapart(DEPARTMENTS *p_dprts)
+{
+	system("cls");
+	printf("\t\t删除部门\n"); 
+	return true; 
+}
+// 修改部门 
+bool admin_udpate_dapart(DEPARTMENTS *p_dprts)
+{
+	system("cls");
+	printf("\t\t修改部门\n"); 
+	return true; 
+}
+// 查找部门 
+bool admin_select_dapart(DEPARTMENTS dprts){
+	system("cls");
+	printf("\t\t查找部门\n"); 
+	return true; 
+}
+// 部门信息总览 
+bool dapart_info(DEPARTMENTS dprts)
+{
+	system("cls");
+	printf("\t\t部门信息总览 \n"); 
+	return true; 
+}
+
+
+
+
+
+
+////////////////////////////////////////////////部门经理操作///////////////////////////////////////////////
+
+////////////////////////////////////////////////一般员工操作///////////////////////////////////////////////
 // 员工入职 
 bool staff_induction(USERS *p_users,USER *p_user)
 {
