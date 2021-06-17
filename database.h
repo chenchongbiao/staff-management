@@ -1,6 +1,5 @@
 #ifndef __DATABASE_H_
-#define __DATABASE_H_
-
+#define __DATABASE_H_   
 sqlite3 *db = NULL;  // 数据库名称
 
 //连接数据库
