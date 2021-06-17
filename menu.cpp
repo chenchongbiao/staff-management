@@ -28,6 +28,7 @@ void admin_menu()
     printf("\t\t*                          *\n");
     printf("\t\t*     3.员 工 查 询 统 计  *\n");
     printf("\t\t*                          *\n");
+    printf("\t\t*     3.删除数据库         *\n");
     printf("\t\t*                          *\n");
     printf("\t\t*     0.退出系统           *\n");
     printf("\t\t*     请选择功能(0-3）     *\n");
@@ -46,7 +47,6 @@ void manage_menu()
     printf("\t\t*     1.员 工 管 理        *\n");
     printf("\t\t*                          *\n");
     printf("\t\t*     2.员 工 查 询 统 计  *\n");
-    printf("\t\t*                          *\n");
     printf("\t\t*                          *\n");
     printf("\t\t*     0.退出系统           *\n");
     printf("\t\t*     请选择功能(0-3）     *\n");

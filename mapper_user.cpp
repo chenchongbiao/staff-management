@@ -5,8 +5,8 @@
 ///////////////////////////////////添加用户/////////////////////////////////////////////
 int save_user(sqlite3 *db,DATABASE *datainfo, USER user)
 {
-	char *save_sql = "INSERT INTO user (user_name,name,password,role_id,sex,department_id,education,staff_id,mobile,status)\
-            		  VALUES ('%s', '%s', '%s', %d, %d , %d , %d, %d,%d,%d);"; 
+	char *save_sql = "INSERT INTO user (username,name,password,role_id,sex,department_id,education,staff_id,mobile,status)\
+            		  VALUES ('%s', '%s','%s',%d,%d,%d,%d,%d,%s,%d);"; 
     select_user_by_staffId(db,datainfo,user.staff_id);		// 使用员工号查找是否已经创建该用户了 
     if (datainfo->rowCount > 1){
     	return 2;								// 员工号已经存在 
@@ -14,6 +14,14 @@ int save_user(sqlite3 *db,DATABASE *datainfo, USER user)
 	select_user_by_username(db,datainfo,user.username);
     if (datainfo->rowCount > 1){
     	return 3;								// 用户名已经存在 
+	}
+	// 开始创建新用户
+	sprintf(datainfo->sql,save_sql,user.username,user.name,user.password,user.role_id,user.sex,user.department_id,user.education,user.staff_id,user.mobile,user.status); 
+	printf("%s",save_sql); 
+	if(SQLITE_OK != sqlite3_get_table(db ,datainfo->sql , &datainfo->tableData , &datainfo->rowCount , &datainfo->columnCount , &datainfo->errorInfo ))
+	{
+		printf("\nERROR:%s\n",datainfo->errorInfo);
+		return 0;												// 创建失败 
 	}
 	return 1; 
 }
