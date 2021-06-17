@@ -3,15 +3,18 @@
 			数据库读取方式 
 */ 
 ///////////////////////////////////添加用户/////////////////////////////////////////////
-int save_user(sqlite3 *db)
+int save_user(sqlite3 *db,DATABASE *datainfo, USER user)
 {
-	USER user;				// 用户信息 
-	DEPARTMENT dprt;		// 部门信息 
-	DATABASE database;		// 数据库信息 
-	char ch;  				// 存放选择 
 	char *save_sql = "INSERT INTO user (user_name,name,password,role_id,sex,department_id,education,staff_id,mobile,status)\
             		  VALUES ('%s', '%s', '%s', %d, %d , %d , %d, %d,%d,%d);"; 
-            		  
+    select_user_by_staffId(db,datainfo,user.staff_id);		// 使用员工号查找是否已经创建该用户了 
+    if (datainfo->rowCount > 1){
+    	return 2;								// 员工号已经存在 
+	}
+	select_user_by_username(db,datainfo,user.username);
+    if (datainfo->rowCount > 1){
+    	return 3;								// 用户名已经存在 
+	}
 	return 1; 
 }
 ///////////////////////////////////删除用户/////////////////////////////////////////////
@@ -24,23 +27,24 @@ int update_user(sqlite3 *db)
 ///////////////////////////////////查找用户/////////////////////////////////////////////// 
 
 // 通过用户名查找 
-int select_user_by_username(sqlite3 *db)
+int select_user_by_username(sqlite3 *db,DATABASE *datainfo,char *username)
 {
-	
+	char *select_sql = "SELECT * FROM user WHERE username = '%s';";
+	sprintf(datainfo->sql,select_sql,username);
+	if(SQLITE_OK != sqlite3_get_table(db ,datainfo->sql , &datainfo->tableData , &datainfo->rowCount , &datainfo->columnCount , &datainfo->errorInfo ))
+	{
+		printf("\nERROR:%s\n",datainfo->errorInfo);
+		return 0;												// 查找失败 
+	}
 	return 1;
 }
 
 // 通过员工号查找 
 int select_user_by_staffId(sqlite3 *db,DATABASE *datainfo,int staff_id)
 {	
-	USER user;				// 用户信息 
-	DEPARTMENT dprt;		// 部门信息 
-	DATABASE database;		// 数据库信息 
-	char ch;				// 存放选择 
 	char *select_sql = "SELECT * FROM user WHERE staff_id = %d;";
 	sprintf(datainfo->sql,select_sql,staff_id);
 	if(SQLITE_OK != sqlite3_get_table(db ,datainfo->sql , &datainfo->tableData , &datainfo->rowCount , &datainfo->columnCount , &datainfo->errorInfo ))
-
 	{
 		printf("\nERROR:%s\n",datainfo->errorInfo);
 		return 0;
@@ -58,10 +62,6 @@ int select_user_by_staffId(sqlite3 *db,DATABASE *datainfo,int staff_id)
 //	    } 
 //		
 //	}
-	else{
-		printf("没有数据！\n");
-		return 0;
-	}
 	return 1;
 }
 
@@ -83,7 +83,7 @@ int save_user(USERS *p_users,USER user)
 ///////////////////////////////////修改用户/////////////////////////////////////////////
 int update_user(USERS *p_users,USER user)
 {
-    int index = select_user_by_username(*p_users,user.user_name);
+    int index = select_user_by_username(*p_users,user.username);
     if (index < 0 || index >= p_users->length)
     	return 0;
     p_users->users[index] = user;
@@ -97,7 +97,7 @@ int select_user_by_username(USERS users,char *p_username)
 	int i;
 	for (i = 0; i < users.length; i++)
 	{
-		if (strcmp(users.users[i].user_name ,p_username) == 0)	// 用户名一致
+		if (strcmp(users.users[i].username ,p_username) == 0)	// 用户名一致
 		{
 			return i;		// 返回索引位置 
 		} 
