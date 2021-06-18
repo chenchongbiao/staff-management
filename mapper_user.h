@@ -4,6 +4,7 @@
 #include <string.h>
 #include "struct.h" 
 #include "sqlite3.h"
+//#include "database.h"
 
 /*
 			数据库读取方式 
@@ -11,14 +12,18 @@
 ///////////////////////////////////添加用户/////////////////////////////////////////////
 int save_user(sqlite3 *db,DATABASE *datainfo, USER user); 
 ///////////////////////////////////删除用户/////////////////////////////////////////////
-
+// 通过员工号删除 
+int delete_user_by_staffId(sqlite3 *db,DATABASE *datainfo,int staff_id); 
 ///////////////////////////////////修改用户/////////////////////////////////////////////
-int update_user(sqlite3 *db);
+int update_user_by_staffId(sqlite3 *db,DATABASE *datainfo, USER user);
 ///////////////////////////////////查找用户/////////////////////////////////////////////// 
-// 通过用户名查找 
-int select_user_by_username(sqlite3 *db,DATABASE *datainfo,char *username);
 // 通过员工号查找 
 int select_user_by_staffId(sqlite3 *db,DATABASE *datainfo,int staff_id);
+// 通过用户名查找 
+int select_user_by_username(sqlite3 *db,DATABASE *datainfo,char *username);
+// 执行数据库语句 
+int exec(sqlite3 *db,DATABASE *datainfo);
+
 
 /*
 			文件读取方式 
