@@ -34,6 +34,8 @@ int update_user_name(sqlite3 *db,DATABASE *datainfo,USER user);
 int update_user_password(sqlite3 *db,DATABASE *datainfo,USER user); 
 // 修改学历 
 int update_user_edu(sqlite3 *db,DATABASE *datainfo,USER user); 
+// 修改电话 
+int update_user_mobile(sqlite3 *db,DATABASE *datainfo,USER user);
 // 修改在职状态
 int update_user_status(sqlite3 *db,DATABASE *datainfo,USER user); 
 // 通过员工号修改个人信息 

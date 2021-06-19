@@ -86,14 +86,23 @@ int update_user_edu(sqlite3 *db,DATABASE *datainfo,USER user)
 	return code; 
 }
 
+// 修改电话 
+int update_user_mobile(sqlite3 *db,DATABASE *datainfo,USER user)
+{
+	int code; 
+	char *update_sql = "UPDATE user SET mobile = '%s' WHERE staff_id  = '%s';";
+	sprintf(datainfo->sql,update_sql,user.mobile,user.staff_id);
+	code = exec(db,datainfo);
+	return code; 
+}
+
 // 修改在职状态
 int update_user_status(sqlite3 *db,DATABASE *datainfo,USER user)
 {
 	int code;
-	char *update_sql = "UPDATE user SET status = %d WHERE staff_id = '%s';";
-	if (user.status == 1) user.status = 0;
-	else user.status = 1;
-	sprintf(datainfo->sql,update_sql,user.status,user.staff_id);
+	char *update_sql = "UPDATE user SET status = %d WHERE staff_id = '%s';\
+						SELECT * FROM user WHERE staff_id = '%s';";
+	sprintf(datainfo->sql,update_sql,user.status,user.staff_id,user.staff_id);
 	code = exec(db,datainfo);
 	return code; 
 }
