@@ -96,7 +96,8 @@ bool update_info(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 	update_username(db,datainfo,p_user);
 	update_name(db,datainfo,p_user);
 	update_password(db,datainfo,p_user);
-	printf("%s",p_user->password);
+	update_edu(db,datainfo,p_user);
+	printf("%d",p_user->education);
 	system("pause");
 	return true;
 }
@@ -207,20 +208,22 @@ void printUserInfo(DATABASE *datainfo)
 	if(datainfo->rowCount > 0) 
 	{ 
 		char **data; 
-		char *column_name[] = {"用户名","姓名","密码","权限","性别","部门","学历","员工号","电话","在职状态"};
-		char *role[] = {"普通用户","部门经理","管理员"};
-		char *sex[] = {"女","男"}; 
-		char *dprt[] = {"技术部","开发部","产品部"};
-		char *education[] = {"小学","初级中学","高级中学","中专","职校","中技","专科","本科","硕士研究生","博士研究生"};
-		char *status[] = {"离职","在职"}; 
+//		char *column_name[] = {"用户名","姓名","密码","权限","性别","部门","学历","员工号","电话","在职状态"};
+//		char *role[] = {"普通用户","部门经理","管理员"};
+//		char *sex[] = {"女","男"}; 
+//		char *dprt[] = {"技术部","开发部","产品部"};
+//		char *education[] = {"小学","初级中学","高级中学","中专","职校","中技","专科","本科","硕士研究生","博士研究生"};
+//		char *status[] = {"离职","在职"}; 
 		data = datainfo->tableData;
 		for(int i=0;i < 10;i++)
 		{
 			data[i] = column_name[i];
 		} 
-		printf("=============================================================================================================");
+		printf("\n===============================================================================================================================\n");
 	    for(int i=0;i<(datainfo->rowCount+1)*datainfo->columnCount;i++)
 	    {
+	    	if((i+1)%datainfo->columnCount == 4 && i > 9)
+				datainfo->tableData[i] = "******";		// 根据权限的数字替换 
 	    	if((i+1)%datainfo->columnCount == 4 && i > 9)
 				datainfo->tableData[i] = role[atoi(datainfo->tableData[i])];		// 根据权限的数字替换 
 			if((i+1)%datainfo->columnCount == 5 && i > 9)
@@ -234,9 +237,8 @@ void printUserInfo(DATABASE *datainfo)
 			printf("%-12s",datainfo->tableData[i]);							
 	        if((i+1)%datainfo->columnCount == 0)
 	        {
-	            printf("\n");
+	            printf("\n===============================================================================================================================\n");
 	        }
-	        printf("=============================================================================================================");
 		} 
 	} 
 }
@@ -311,9 +313,48 @@ bool update_password(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 			}else{
 				flag = false;
 			}
-		}
 
-//		update_user_password(db,datainfo,*p_user); 
+		}
+		printf("\n\t\t请输入新密码：");
+		fflush(stdin);
+		scanf("%s",password); 
+		code = update_user_password(db,datainfo,*p_user); 	
+		if (code)
+		{
+			printf("\n\t\t密码修改成功！"); 
+		}
+		p_user->password = password; 
+		return true;
+	}
+	return false;
+}
+
+// 修改学历 
+bool update_edu(sqlite3 *db,DATABASE *datainfo,USER *p_user) 
+{	
+	int code;
+	if (alert("学历 "))
+	{
+		printf("\n\t\t请输入学历：");
+		fflush(stdin);
+		scanf("%d",&p_user->education); 
+		update_user_edu(db,datainfo,*p_user); 
+		return true;
+	}
+	return false;
+}
+
+// 修改学历 
+bool update_mobile(sqlite3 *db,DATABASE *datainfo,USER *p_user) 
+{	
+	int code;
+	if (alert("电话 "))
+	{
+		printf("\n\t\t请输入电话：");
+		fflush(stdin);
+		scanf("%s",&p_user->mobile); 
+		update_user_edu(db,datainfo,*p_user); 
+		printf("%s",p_user->mobile);
 		return true;
 	}
 	return false;
@@ -323,7 +364,7 @@ bool update_password(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 int alert(char *info)
 {
 	char ch;
-	printf("\t\t是否修改%s?(Y/N)",info);
+	printf("\n\t\t是否修改%s?(Y/N)",info);
 	fflush(stdin);
 	scanf("%c",&ch);
 	if (ch == 'y' || ch == 'Y')

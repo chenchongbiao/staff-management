@@ -29,7 +29,11 @@ int delete_user_by_staffId(sqlite3 *db,DATABASE *datainfo,char staff_id);
 // 修改用户名 
 int update_user_username(sqlite3 *db,DATABASE *datainfo,USER user); 
 // 修改姓名 
-int update_user_name(sqlite3 *db,DATABASE *datainfo,USER user); 
+int update_user_name(sqlite3 *db,DATABASE *datainfo,USER user);
+// 修改密码 
+int update_user_password(sqlite3 *db,DATABASE *datainfo,USER user); 
+// 修改学历 
+int update_user_edu(sqlite3 *db,DATABASE *datainfo,USER user); 
 // 修改在职状态
 int update_user_status(sqlite3 *db,DATABASE *datainfo,USER user); 
 // 通过员工号修改个人信息 

@@ -76,6 +76,16 @@ int update_user_password(sqlite3 *db,DATABASE *datainfo,USER user)
 	return code; 
 }
 
+// 修改学历 
+int update_user_edu(sqlite3 *db,DATABASE *datainfo,USER user)
+{
+	int code; 
+	char *update_sql = "UPDATE user SET education = %d WHERE staff_id  = '%s';";
+	sprintf(datainfo->sql,update_sql,user.education,user.staff_id);
+	code = exec(db,datainfo);
+	return code; 
+}
+
 // 修改在职状态
 int update_user_status(sqlite3 *db,DATABASE *datainfo,USER user)
 {

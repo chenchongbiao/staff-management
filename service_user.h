@@ -7,7 +7,12 @@
 #include "mapper_user.h"
 #include "struct.h"
 
-
+char *column_name[] = {"用户名","姓名","密码","权限","性别","部门","学历","员工号","电话","在职状态"};
+char *role[] = {"普通用户","部门经理","管理员"};
+char *sex[] = {"女","男"}; 
+char *dprt[] = {"技术部","开发部","产品部"};
+char *education[] = {"小学","初级中学","高级中学","中专","职校","中技","专科","本科","硕士研究生","博士研究生"};
+char *status[] = {"离职","在职"}; 
 
 /*
 ===========================================================================================================================										
@@ -73,7 +78,9 @@ bool update_username(sqlite3 *db,DATABASE *datainfo,USER *p_user);
 // 修改姓名 
 bool update_name(sqlite3 *db,DATABASE *datainfo,USER *p_user); 
 // 修改密码 
-bool update_password(sqlite3 *db,DATABASE *datainfo,USER *p_user); 
+bool update_password(sqlite3 *db,DATABASE *datainfo,USER *p_user);
+// 修改学历 
+bool update_edu(sqlite3 *db,DATABASE *datainfo,USER *p_user);  
 // 询问是否修改信息
 int alert(char *info); 
 #endif 
