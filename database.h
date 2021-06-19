@@ -1,17 +1,11 @@
-#ifndef __DATABASE_H_
-#define __DATABASE_H_   
-sqlite3 *db = NULL;  // 数据库名称
+#ifndef __DATABASE_H__
+#define __DATABASE_H__
 
-//连接数据库
-char dbname[] = "staffManagement.db";
-char *errorInfo = NULL; // 错误信息
-int notOpen;  // 是否连接,真表示未连接
-int rowCount=0; // 行数
-int columnCount = 0; // 列数
-char **tableData=NULL; // 数据表的记录
+sqlite3 *db = NULL;  						// 数据库连接 
+char dbname[] = "staffManagement.db";		// 数据库名称
 
-// notOpen = sqlite3_open(dbname, &db);
-
+//int exec_sql(sqlite3 *db,DATABASE *datainfo); 
+// notOpen = sqlite3_open(dbname, &db);// 打开数据库 接返回不为0则打开失败 
 /*该例程打开一个指向 SQLite 数据库文件的连接，返回一个用于其他 SQLite 程序的数据库连接对象。
 
 如果 filename 参数是 NULL 或 ':memory:'，那么 sqlite3_open() 将会在 RAM 中创建一个内存数据库，
