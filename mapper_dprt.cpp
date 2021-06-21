@@ -49,6 +49,23 @@ int select_dprt_by_name(sqlite3 *db,DATABASE *datainfo, DEPARTMENT dprt)
 	exec(db,datainfo);
 	return 1;
 }
+// 根据id查找部门
+int select_dprt_by_id(sqlite3 *db,DATABASE *datainfo, int rowid)
+{
+	char *select_sql = "SELECT * FROM department WHERE rowid = '%d';";
+	sprintf(datainfo->sql,select_sql,rowid);
+	exec(db,datainfo);
+	return 1;
+}
+// 查找所有部门
+int select_all_dprt(sqlite3 *db,DATABASE *datainfo)
+{
+    int code = 1;
+    char *select_sql = "SELECT rowid,* FROM department;";
+	sprintf(datainfo->sql,select_sql);
+	exec(db,datainfo);
+	return code;
+}
 
 
 

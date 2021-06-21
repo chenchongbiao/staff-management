@@ -21,4 +21,8 @@ int delete_user_by_dprtId(sqlite3 *db,DATABASE *datainfo, DEPARTMENT dprt);
 int select_dprt_by_name(sqlite3 *db,DATABASE *datainfo,DEPARTMENT dprt);
 // 执行数据库语句 
 int exec(sqlite3 *db,DATABASE *datainfo);
+// 查找所有部门
+int select_all_dprt(sqlite3 *db,DATABASE *datainfo);
+// 根据id查找部门
+int select_dprt_by_id(sqlite3 *db,DATABASE *datainfo, int rowid);
 #endif
