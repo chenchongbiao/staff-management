@@ -1,165 +1,167 @@
 #include "main.h"
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
+/* run this program using the console pauser or add your own getch, system("pause") or input loop */
 int main(int argc, char** argv) {
-	USERS users;						// 存放读取的用户数据 
+	USERS users;						// 存放读取的用户数据
 	DEPARTMENTS dprts;					// 存放读入的部门数据
-	 
-	
-	USER user, curr_user;				// curr_user为当前登录用户 
-	DEPARTMENT dprt;					// 部门实体 
-	
+	USER user, curr_user;				// curr_user为当前登录用户
+	DEPARTMENT dprt;					// 部门实体
+	DATABASE datainfo;					// 数据库返回信息
 	char ch,password[30];
 	int menu_item,menu_item2; 			// 菜单项
-	bool dirty[] = {false,false,false}; // 依次是users,cards, transactions的脏标志，如果为true，则在退出程序前，要提示保存 
-	bool is_logout, is_success;			// 注销标志 
-	printf("是否初始化数据？（y/n）");
-	scanf("%c",&ch);
-	if(ch == 'Y' || ch == 'y')
-	{
-		init_data_files();
-		printf("系统初始化完毕！请重启程序！\n");
-		return 0;
-	}
-	
-	// 加载数据 
- 	if (!read_users(&users)) {
- 		printf("加载用户信息失败，程序终止！\n");
- 		return 0;
-	}
-	
+	bool is_success;			// 注销标志
+	int role; 							// 权限
+	char **data;
 
-	while(true){	
+
+//=====================================================测试开始
+//	char test[30] = "admin";
+//	int notOpen = sqlite3_open(dbname, &db);
+//    if( notOpen )
+//    {
+//        fprintf(stderr, "数据库连接失败: %s\n ", sqlite3_errmsg(db));
+//        sqlite3_close(db);
+//        exit(1);
+//    }
+
+//    user.username = (char *)malloc(30);
+//    user.name = (char *)malloc(30);
+//    user.password = (char *)malloc(30);
+//    user.mobile = (char *)malloc(30);
+//    user.staff_id = (char *)malloc(30);
+//    user.username = (char *)malloc(30);
+//    user.username = (char *)malloc(30);
+//    user.username = (char *)malloc(30);
+//    user.username = (char *)malloc(30);
+//    user.username = (char *)malloc(30);
+//	scanf("%s",user.username);
+//	scanf("%s",user.name);
+//	scanf("%s",user.password);
+//	scanf("%s",user.mobile);
+//	user.role_id = 2;
+//	user.sex = 2;
+//	user.department_id = 5;
+//	user.education = 5;
+//	user.staff_id = "28890";
+//	user.status = 0;
+//	save_user(db,&datainfo,user);
+
+//	update_user_by_staffId(db,&datainfo,user);
+//	delete_user_by_staffId(db,&datainfo,6);
+
+
+/*=====================================================
+                    部门功能测试
+  =====================================================
+*/
+//	int notOpen = sqlite3_open(dbname, &db);
+//	scanf("%s",dprt.NAME);
+//	dprt.rowid = 4;
+//	update_user_by_dprtId(db,&datainfo, dprt);
+//	printf("%d",datainfo.rowCount);
+//	if(datainfo.rowCount > 0)
+//	{
+//	    printf("数据表的记录:\n");
+//	    if(datainfo.rowCount > 0)
+//		{
+//	  		printf("数据表的记录:\n");
+//		    for(int i=0;i<(datainfo.rowCount+1)*datainfo.columnCount;i++)
+//		    {
+//				printf("%-7s\t",datainfo.tableData[i]);
+//
+//		        if((i+1)%datainfo.columnCount == 0)
+//		        {
+//		            printf("\n");
+//		        }
+//			}
+//		}
+//	}
+
+
+//				if(datainfo.rowCount > 0)
+//				{
+//					curr[0] = column_name[0],curr[1] = column_name[1];
+//					for(int i=0;i <(datainfo.rowCount+1)*datainfo.columnCount;i+=10)
+//					{
+//						printf("%8s %8s %8s %8s %8s %8s %8s ",curr[i],curr[i+1],curr[i+2],curr[i+3],curr[i+4],curr[i+5],curr[i+6],curr[i+7]);
+//						printf("\n");
+//					}
+//
+//				}
+
+
+
+//    dprt.NAME = (char *)malloc(20);
+//	scanf("%s",dprt.NAME);
+//    save_dprt(db,&datainfo,dprt);
+//    char **dprtdata;
+//    // 查找所有部门
+//    select_all_dprt(db,&datainfo);
+//    dprtdata = datainfo.tableData;
+//    for(int i = datainfo.columnCount;i < (datainfo.rowCount+1)*datainfo.columnCount;i+=2)
+//    {
+//        printf("rowid== %s-----  data[%d]==%s\n",dprtdata[i],i/2,dprtdata[i+1]);
+//    }
+//	system("pause");
+//	return 0;
+
+//==============================================测试结束=================================================
+
+
+	init_database();
+	home:
+	while(true){
 		system("cls");
-		show_prelogin_menu();	 // 显示登录前菜单，若登录成功，则继续 
+		show_prelogin_menu();	 // 显示登录前菜单，若登录成功，则继续
 		scanf("%d", &menu_item);
 		switch(menu_item)
-		{	
+		{
 			case 1:
-				printf("\t\t开始！"); 
+
 				// 开始登录
-				is_success = login(users,&curr_user); 	
+				is_success = login(db,&datainfo,&curr_user);
 				if(!is_success) // 登录失败时
 					break;
-					
-				// 登录成功，根据不同用户显示菜单 
+				data = datainfo.tableData;
+				curr_user_info(data,&curr_user);
+				// 登录成功，根据不同用户显示菜单
 				switch (curr_user.role_id)
 				{
-					case 0: // 一般员工	
-						is_logout = false;
+					case 0: // 一般员工
 						while (true)
 						{
+							system("cls");
 							staff_menu();
 							scanf("%d",&menu_item);
 							switch(menu_item)
 							{
-								case 1: // 员工入职
-									staff_induction(&users,&curr_user);
-									dirty[0] = true;	// 用户数据被修改，设置脏标志
+								case 1: // 员工确认入职
+									staff_induction(db,&datainfo,&curr_user);
 									break;
 								case 2: // 员工离职
-									staff_induction(&users,&curr_user);
-									dirty[0] = true;	// 用户数据被修改，设置脏标志
+									staff_dimission(db,&datainfo,&curr_user);
 									break;
-								case 3:
-									printf("修改个人信息");
-									dirty[0] = true;	// 用户数据被修改，设置脏标志
-									break; 
+								case 3:	// 修改用户信息
+									update_info(db,&datainfo,&curr_user);
+									break;
 								case 0:
-									printf("返回上一页!");
-									is_logout = true;
+								    goto home;
 									break;
-								default:	// 若输入的是非数字，则清空缓冲区 
+								default:	// 若输入的是非数字，则清空缓冲区
 									fflush(stdin);
 							}
-							if (is_logout) // 返回上一页 
-								break;
 						}
-					case 1: // 部门经理 
-						is_logout = false;					
+						break;
+					case 1: // 部门经理
 						while(true)
 						{
+						    manage:
+							system("cls");
 							manage_menu();
 							scanf("%d",&menu_item);
 							switch(menu_item)
 							{
-								case 1: // 该部门下的员工管理 
-									while(true)
-									{
-										staff_manage_menu();
-										scanf("%d",&menu_item2);
-										switch(menu_item2)
-										{
-											case 1:
-												printf("添加员工");
-												break;
-											case 2:
-												printf("删除员工");
-												break;
-											case 3:
-												printf("修改员工");
-												break;
-											case 4:
-												printf("查找员工");
-												break;
-											case 5: 
-												printf("信息总览");
-												break;
-											case 0:	
-												printf("返回上一页!");
-												break;
-											default:	// 若输入的是非数字，则清空缓冲区 
-												fflush(stdin);
-										}
-									}
-									staff_induction(&users,&curr_user);
-									dirty[0] = true;	// 用户数据被修改，设置脏标志
-									break;
-								case 2: // 员工查询统计
-									while(true)
-									{
-										total_staff();
-										scanf("%d",&menu_item2);
-										switch(menu_item2)
-										{
-											case 1: // 按性别
-												printf("按性别");
-												break;
-											case 2:
-												printf("按部门");
-												break; 
-											case 3:
-												printf("按学历"); 
-												break;
-											case 0:	
-												printf("返回上一页!");
-												break;
-											default:	// 若输入的是非数字，则清空缓冲区 
-												fflush(stdin);
-										}
-									} 
-									break;
-								case 0:
-									printf("返回上一页!");
-									is_logout = true;
-									break;
-								default:	// 若输入的是非数字，则清空缓冲区 
-									fflush(stdin);
-							}
-							if (is_logout) // 返回上一页 
-								break;
-						} 
-					case 2:  // 管理员 
-						is_logout = false;	
-						while(true)
-						{
-							admin_menu: 
-							system("cls");
-							admin_menu();
-							scanf("%d",&menu_item);
-							switch(menu_item)
-							{
-								case 1: // 全部员工管理 
+								case 1: // 该部门下的员工管理
 									while(true)
 									{
 										system("cls");
@@ -168,30 +170,100 @@ int main(int argc, char** argv) {
 										switch(menu_item2)
 										{
 											case 1:
-												admin_save_user(&users);
+												save_staff(db,&datainfo,&curr_user);
 												break;
 											case 2:
-												admin_delete_user(&users);
+												delete_staff(db,&datainfo,&curr_user);
 												break;
 											case 3:
-												admin_udpate_user(&users);
+												update_staff(db,&datainfo,&curr_user);
 												break;
 											case 4:
-												admin_select_user(users);
+												select_staff(db,&datainfo,&curr_user);
 												break;
-											case 5: 
-												staff_info(users);
+											case 5:
+												select_all_staff(db,&datainfo,&curr_user);
 												break;
-											case 0:	
-												printf("\t\t返回上一页!\n");
-												goto admin_menu;
+											case 0:
+												goto manage;
 												break;
-											default:	// 若输入的是非数字，则清空缓冲区 
+											default:	// 若输入的是非数字，则清空缓冲区
 												fflush(stdin);
 										}
 									}
-									staff_induction(&users,&curr_user);
-									dirty[0] = true;	// 用户数据被修改，设置脏标志
+									break;
+								case 2: // 员工查询统计
+									while(true)
+									{
+									    system("cls");
+										total_staff();
+										scanf("%d",&menu_item2);
+										switch(menu_item2)
+										{
+											case 1: // 按性别
+												count_by_sex(db,&datainfo,&curr_user);
+												break;
+											case 2:
+												count_by_dprt(db,&datainfo,&curr_user);
+												break;
+											case 3:
+												count_by_edu(db,&datainfo,&curr_user);
+												break;
+											case 0:
+												goto manage;
+												break;
+											default:	// 若输入的是非数字，则清空缓冲区
+												fflush(stdin);
+										}
+									}
+									break;
+								case 0:
+								    goto home;
+									break;
+								default:	// 若输入的是非数字，则清空缓冲区
+									fflush(stdin);
+							}
+						}
+						break;
+					case 2:  // 管理员
+						while(true)
+						{
+							admin_menu:
+							system("cls");
+							admin_menu();
+							scanf("%d",&menu_item);
+							switch(menu_item)
+							{
+								case 1: // 全部员工管理
+									while(true)
+									{
+										system("cls");
+										staff_manage_menu();
+										scanf("%d",&menu_item2);
+										switch(menu_item2)
+										{
+											case 1:
+												save_staff(db,&datainfo,&curr_user);
+												break;
+											case 2:
+												delete_staff(db,&datainfo,&curr_user);
+												break;
+											case 3:
+												update_staff(db,&datainfo,&curr_user);
+												break;
+											case 4:
+												select_staff(db,&datainfo,&curr_user);
+												break;
+											case 5:
+												select_all_staff(db,&datainfo,&curr_user);
+												break;
+											case 0:
+												goto admin_menu;
+												break;
+											default:	// 若输入的是非数字，则清空缓冲区
+												fflush(stdin);
+										}
+									}
 									break;
 								case 2:
 									while(true)
@@ -202,122 +274,154 @@ int main(int argc, char** argv) {
 										switch(menu_item2)
 										{
 											case 1:
-												admin_save_dapart(&dprts);
+												admin_save_dapart(db,&datainfo);
 												break;
 											case 2:
-												admin_delete_dapart(&dprts);
+												admin_delete_dapart(db,&datainfo);
 												break;
 											case 3:
-												admin_udpate_dapart(&dprts);
+												admin_udpate_dapart(db,&datainfo);
 												break;
 											case 4:
-												admin_select_dapart(dprts);
+												admin_select_dapart(db,&datainfo);
 												break;
-											case 5: 
-												dapart_info(dprts);
+											case 5:
+												dapart_info(db,&datainfo);
 												break;
-											case 0:	
-												printf("返回上一页!");
+											case 0:
 												goto admin_menu;
 												break;
-											default:	// 若输入的是非数字，则清空缓冲区 
+											default:	// 若输入的是非数字，则清空缓冲区
 												fflush(stdin);
 										}
-									}								
+									}
 								case 3:
 									while(true)
 									{
 										system("cls");
 										total_staff();
 										scanf("%d",&menu_item2);
-										switch(menu_item2)   //  
+										switch(menu_item2)   //
 										{
 											case 1: // 按性别
-												count_by_sex(users,curr_user);
+												count_by_sex(db,&datainfo);
+
 												break;
-											case 2:	// 按部门 
-												count_by_dprt(users,curr_user);
-												break; 
-											case 3: // 按学历 
-												count_by_edu(users,curr_user);
+											case 2:	// 按部门
+												count_by_dprt(db,&datainfo);
 												break;
-											case 0:	
-												printf("返回上一页!");
+											case 3: // 按学历
+												count_by_edu(db,&datainfo);
+												break;
+											case 0:
 												goto admin_menu;
 												break;
-											default:	// 若输入的是非数字，则清空缓冲区 
+											default:	// 若输入的是非数字，则清空缓冲区
 												fflush(stdin);
 										}
-									} 
-								case 0:
+									}
+								case 4:
+									// 删除数据库
+                                    delete_database(db,&datainfo);
 									exit(0);
+//									break;
+								case 0:
+								    goto home;
 								default:
 									fflush(stdin);
-								
-							} 
-						} 
+
+							}
+						}
 					default:
 						exit(0);
-						
-				} 
+
+				}
+				break;
 			case 0:
-				if (!save_data(dirty, 1, users)) 	// 退出系统前，保存数据 
-				printf("保存数据失败\n");
 				exit(0);
 			default:
 				fflush(stdin);
-		} 
+		}
 	}
-	
-	
+
+
 	return 0;
 }
+void init_database()
+{
+	system("mode con cols=120 lines=40");
+	//	printf("正在连接数库\n");
+//	Sleep(3000);
+//	system("cls");
+	int staff_res,dprt_res;
+	char *name = "admin";
+	DATABASE data;
+	// 创建用户表并插入一个用户
+	char *user_sql = "CREATE TABLE if not exists [user](\
+				  [username] VARCHAR(30) NOT NULL DEFAULT NULL, \
+				  [name] VARCHAR(30) NOT NULL DEFAULT NULL, \
+				  [password] VARCHAR(30) NOT NULL DEFAULT NULL, \
+				  [role_id] INT(1) NOT NULL, \
+				  [sex] INT(1) NOT NULL, \
+				  [department_id] INT(11) NOT NULL, \
+				  [education] INT(1) NOT NULL, \
+				  [staff_id] VARCHAR(11) NOT NULL, \
+				  [mobile] VARCHAR(13) NOT NULL, \
+				  [status] INT(1) NOT NULL)\;\
+				  INSERT INTO user (username,name,password,role_id,sex,\
+				  department_id,education,staff_id,mobile,status)\
+                  VALUES ('admin','admin','admin',2,1,0 ,-1, 0,0,1);";
+	// 创建部门表语句
+	char *dprt_sql = "CREATE TABLE if not exists [department](\
+			  [name] VARCHAR(30) NOT NULL DEFAULT NULL);";
+
+	// 添加管理员用户
+//	char *add_admin = "INSERT INTO user (username,name,password,role_id,sex,department_id,education,staff_id,mobile,status)\
+//           				VALUES ('admin','admin','admin',2,1,0 ,-1, 0,0,1);";
+
+    int notOpen = sqlite3_open(dbname, &db);
+
+    /*该例程打开一个指向 SQLite 数据库文件的连接，返回一个用于其他 SQLite 程序的数据库连接对象。
+
+	如果 filename 参数是 NULL 或 ':memory:'，那么 sqlite3_open() 将会在 RAM 中创建一个内存数据库，
+
+	这只会在 session 的有效时间内持续。如果文件名 filename 不为 NULL，那么 sqlite3_open() 将使用这个参数值尝试打开数据库文件。
+
+	如果该名称的文件不存在，sqlite3_open() 将创建一个新的命名为该名称的数据库文件并打开。*/
 
 
-// 存储所有数据 
-bool save_data(bool *dirty, int size, USERS users){
-	int ret = true;
-	char ch;
-	
-	for (int i = 0; i < size; i ++){
-		if (dirty[i]) {
-			switch (i){
-			case 0:
-				printf("用户信息已经被修改，是否保存？(Y/N)");
-				fflush(stdin);
-				scanf("%c", &ch);
-				if (ch != 'N' && ch != 'n') 
-					ret = write_users(users);
-				break;
-				
-			}
-		}	
+    if( notOpen )
+    {
+        fprintf(stderr, "数据库连接失败: %s\n ", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        exit(1);
+    }
+
+    else printf("数据库连接成功！\n",db);
+    int res = select_user_by_username(db,&data,name);
+    if (res != 1)
+    {
+	   	staff_res = sqlite3_exec(db,user_sql,NULL,NULL,NULL);
+		dprt_res =  sqlite3_exec(db,dprt_sql,NULL,NULL,NULL);
+		if(staff_res !=SQLITE_OK)
+		{
+			printf("创建用户表表失败！%s\n",sqlite3_errmsg(db));
+			exit(1);
+		}
+		if(dprt_res !=SQLITE_OK)
+		{
+			printf("创建部门表表失败！%s\n",sqlite3_errmsg(db));
+			exit(1);
+		}
 	}
-	
-	return ret;
-} 
 
-// 初始化数据文件，并创建第1个系统管理员用户 
-void init_data_files(){
-	USERS users;     // 用户数组 
-
-	USER admin,manage;		
-	strcpy(admin.user_name, "admin");		// 管理员 
-	admin.role_id = 2;						// 权限id 
-	admin.status = 1;						// 在职 
-	strcpy(admin.name, "admin");			
-	strcpy(admin.password, "admin");	
-	save_user(&users, admin); 
-							
-	strcpy(manage.user_name, "manage");		// 部门经理 
-	manage.role_id = 2;						// 权限id 
-	manage.status = 1;						// 在职 
-	manage.department_id = -1;  
-	strcpy(manage.name, "manage");
-	strcpy(manage.password, "manage");	
-	save_user(&users, manage); 
-	
-	// 清空并创建数据文件 
-	write_users(users);
+//    Sleep(1000);
+//	system("cls");
 }
+
+
+
+
+
+
 

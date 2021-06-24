@@ -1,16 +1,15 @@
 #include "service_user.h"
-using namespace std;
 char *column_name[] = {"用户名","姓名","密码","权限","性别","部门","学历","员工号","电话","在职状态"};
 char *role[] = {"普通用户","部门经理","管理员"};
-char *sex[] = {"女","男"}; 
+char *sex[] = {"女","男"};
 char *education[] = {"小学","初级中学","高级中学","中专","职校","中技","专科","本科","硕士研究生","博士研究生"};
-char *status[] = {"离职","在职"}; 
+char *status[] = {"离职","在职"};
 
 /*
-===========================================================================================================================										
-														
+===========================================================================================================================
+
 													管理员操作
-														
+
 ===========================================================================================================================
 */
 // 添加员工
@@ -18,9 +17,7 @@ bool save_staff(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 {
 	USER *user;
     user = (struct USER*)malloc(sizeof(struct USER));
-    char **dprt = (char **)malloc(20);
-	char in_str[50];
-	int in_int;
+    char **dprt;
 	int code;
     malloc_user(user);                   // 给结构体指针开辟内存
     select_all_dprt(db,datainfo);        // 查找所有部门
@@ -54,7 +51,6 @@ bool save_staff(sqlite3 *db,DATABASE *datainfo,USER *p_user)
     for(int i = 0;i < 10;i++)
         printf("\t\t%d--%s\n",i,education[i]);
 	input_int("学历",user->education);
-
 	input_str("员工号",user->staff_id);
 	while(select_user_by_staffId(db,datainfo,user->staff_id) != 2)
 	{
@@ -65,85 +61,193 @@ bool save_staff(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 	user->status = 0;
     save_user(db,datainfo,*user);
     free_user(user);
-//    free(dprt);
     system("pause");
 	return true;
 
 }
-// 添加员工
-//bool admin_save_user(USERS *p_users)
-//{
-//	system("cls");
-//	USER user; // 存放添加员工的数据
-//	printf("\t\t请设置用户名:");
-//	scanf("%s",user.username);
-//	printf("\n\t\t请输入姓名:"); 
-//	scanf("%s",user.name);
-//	printf("\n\t\t请设置权限（0 一般员工 1 部门管理员 2 系统管理员）");
-//	scanf("%d",&user.role_id);
-//	printf("\n\t\t请设置部门");
-//	return true; 
-//}
-//// 删除员工
-//bool admin_delete_user(USERS *p_users)
-//{
-//	system("cls");
-//	printf("\t\t删除员工\n"); 
-//	return true; 
-//}
-//// 修改员工
-//bool admin_udpate_user(USERS *p_users)
-//{
-//	system("cls");
-//	printf("\t\t修改员工\n"); 	
-//	return true; 
-//}
-//// 查找员工
-//bool admin_select_user(USERS users)
-//{
-//	system("cls");
-//	printf("\t\t查找员工\n"); 	
-//	return true; 
-//}
-//// 信息总览 
-//bool staff_info(USERS users)
-//{
-//	system("cls");
-//	printf("\t\t信息总览\n"); 
-//	return true; 	
-//}
+
+// 删除员工
+bool delete_staff(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
+    int code;                                                // 返回值
+    USER *user = (struct USER*)malloc(sizeof(struct USER));// 存放员工信息的结构体
+    char **data = (char **)malloc(20);                      // 员工信息的二位数组
+    malloc_user(user);                                       // 给结构体指针开辟内存
+    input_str("员工号",user->staff_id);
+    code = select_user_by_staffId(db,datainfo,user->staff_id);// 通过员工号查找
+    if (code == 2)
+    {
+        printf("\t\t该员工不存在！");
+        return false;
+    }
+    data = datainfo->tableData;
+    curr_user_info(data,user);
+    if(p_user->role_id == 1 && user->department_id == p_user->department_id) // 判断删除的用户与部门管理员来着同一个部门
+    {
+        code = delete_user_by_staffId(db,datainfo,user->staff_id);                   // 根据员工号删除
+        if(code == 0)
+        {
+            printf("\t\t删除失败！\n");
+            return false;
+        }else{
+            printf("\t\t删除成功！\n");
+            return true;
+        }
+
+    }else if(p_user->role_id == 1 && user->department_id != p_user->department_id){
+
+        printf("\t\t您没有删除该员工的权限！");
+        return false;
+    }
+    // 管理员可直接进行删除操作
+    code = delete_user_by_staffId(db,datainfo,user->staff_id);                      // 根据员工号删除
+    if(code == 0)
+    {
+        printf("\t\t删除失败！\n");
+        return false;
+    }else{
+        printf("\t\t删除成功！\n");
+        return true;
+    }
+}
+
+// 修改员工信息
+bool update_staff(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
+    int code;                                                // 返回值
+    USER *user = (struct USER*)malloc(sizeof(struct USER));// 存放员工信息的结构体
+    char **data = (char **)malloc(20);                      // 员工信息的二位数组
+    malloc_user(user);                                       // 给结构体指针开辟内存
+    input_str("员工号",user->staff_id);
+    code = select_user_by_staffId(db,datainfo,user->staff_id);// 通过员工号查找
+    if (code == 2)
+    {
+        printf("\t\t该员工不存在！");
+        return false;
+    }
+    data = datainfo->tableData;
+    curr_user_info(data,user);                                  // 把获取的信息赋值给user
+	update_username(db,datainfo,user);
+	update_name(db,datainfo,user);
+	update_password(db,datainfo,user);
+	if(p_user->role_id == 2)
+    {
+        update_role(db,datainfo,user);
+    }
+    update_sex(db,datainfo,user);
+    update_staffId(db,datainfo,user);
+	update_edu(db,datainfo,user);
+	update_mobile(db,datainfo,user);
+	update_status(db,datainfo,user);
+}
+
+// 查找员工信息
+bool select_staff(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
+    int code;                                                // 返回值
+    USER *user = (struct USER*)malloc(sizeof(struct USER));// 存放员工信息的结构体
+    char **data = (char **)malloc(20);
+    malloc_user(user);                                       // 给结构体指针开辟内存
+    input_str("员工号",user->staff_id);
+    code = select_user_by_staffId(db,datainfo,user->staff_id);// 通过员工号查找
+    if (code == 2)
+    {
+        printf("\t\t该员工不存在！");
+        system("pause");
+        return false;
+    }
+    data = datainfo->tableData;
+    curr_user_info(data,user);                                  // 把获取的信息赋值给user
+    if(p_user->role_id == 1 && user->department_id != p_user->department_id)
+    {
+        printf("\t\t您没有权限查看该员工信息！");
+        system("pause");
+        return false;
+    }
+	print_user_Info(db,datainfo);
+	system("pause");
+	return true;
+}
+
+// 管理员查找所有员工信息
+bool select_all_staff(sqlite3 *db,DATABASE *datainfo)
+{
+    int code;                                                // 返回值
+    char **data = (char **)malloc(20);
+    code = select_all_user(db,datainfo);// 通过员工号查找
+    if (code == 2)
+    {
+        printf("\t\t数据库中没有信息！");
+        system("pause");
+        return false;
+    }
+    data = datainfo->tableData;
+	print_user_Info(db,datainfo);
+	system("pause");
+	return true;
+}
+// 删除数据库
+bool delete_database(sqlite3 *db,DATABASE *datainfo)
+{
+    int code;                                                // 返回值
+    char ch;
+    printf("\t\t是否删除数据库？该操作不可逆！（Y/N）");
+    fflush(stdin);
+    scanf("%c",&ch);
+    if(ch == 'Y' || ch == 'y')
+    {
+        code = del_data(db,datainfo);
+        if(code == 0)
+            printf("\t\t数据库删除失败！");
+        else
+            printf("\t\t数据库删除成功！");
+    }
+	system("pause");
+	return true;
+}
+
 //================================================管理员操作结束=========================================================
 
 
 /*
-===========================================================================================================================										
-														
+===========================================================================================================================
+
 													部门经理操作
-														
+
 ===========================================================================================================================
 */
+// 部门经理查找所有员工信息
+bool select_all_staff(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
+    int code;                                                // 返回值
+    char **data = (char **)malloc(20);
+    code = select_all_user(db,datainfo,p_user->department_id);// 通过员工号查找
+    if (code == 2)
+    {
+        printf("\t\t数据库中没有信息！");
+        system("pause");
+        return false;
+    }
+    data = datainfo->tableData;
+	print_user_Info(db,datainfo);
+	system("pause");
+	return true;
+}
 //================================================部门经理操作结束=======================================================
 
 
 /*
-===========================================================================================================================										
-														
+===========================================================================================================================
+
 													一般员工操作
-														
+
 ===========================================================================================================================
 */
-// 员工入职 
+// 员工入职
 bool staff_induction(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 {
+    char ch;
 	select_user_by_staffId(db,datainfo,p_user->staff_id);
-//	char *column_name[] = {"姓名","用户名"};
-//	data = datainfo->tableData;
-//	data[0] = column_name[0],data[1] = column_name[1]; 
-//	for(int i=0;i <(datainfo->rowCount+1)*datainfo->columnCount;i+=10)
-//	{
-//		printf("%8s %8s %8s %8s %8s %8s %8s ",data[i],data[i+1],data[i+2],data[i+3],data[i+4],data[i+5],data[i+6],data[i+7]);
-//		printf("\n");
-//	}
 	if (p_user->status == -1)
 	{
 		printf("\t\t已经离职无法操作！");
@@ -151,12 +255,17 @@ bool staff_induction(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 	}
 	p_user->status = 1;
 	update_user_status(db,datainfo,*p_user);
-	print_user_Info(db,datainfo);	
-	system("pause");
+	select_user_by_staffId(db,datainfo,p_user->staff_id);
+	print_user_Info(db,datainfo);
+	printf("\t\t请确认信息，需要进行修改请输入Y");
+	scanf("%c",&ch);
+	if (ch == 'Y' || ch == 'y')
+        update_info(db,datainfo,p_user);
+	getchar();
 	return true;
 }
 
-// 员工离职 
+// 员工离职
 bool staff_dimission(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 {
 	char ch;
@@ -173,10 +282,10 @@ bool staff_dimission(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 	return false;
 }
 
-// 修改个人信息 
+// 修改个人信息
 bool update_info(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 {
-	char ch; 
+	char ch;
 	if (p_user->status == -1)
 	{
 		printf("已经离职无法操作！");
@@ -186,9 +295,9 @@ bool update_info(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 	update_username(db,datainfo,p_user);
 	update_name(db,datainfo,p_user);
 	update_password(db,datainfo,p_user);
+	update_sex(db,datainfo,p_user);
 	update_edu(db,datainfo,p_user);
-	update_mobile(db,datainfo,p_user); 
-	printf("%s",p_user->mobile);
+	update_mobile(db,datainfo,p_user);
 	system("pause");
 	return true;
 }
@@ -197,27 +306,27 @@ bool update_info(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 //================================================一般员工操作结束=========================================================
 
 /*
-===========================================================================================================================										
-														
-														公共函数 
-														
+===========================================================================================================================
+
+														公共函数
+
 ===========================================================================================================================
 */
 
-// 用户登录 
+// 用户登录
 bool login(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 {
 	USER *user;
-	int res,i; 				// 用户索引位置 
-	char ch;				// 接收字符输入 
-	char **data;			// 接收回传数据 
+	int res,i; 				// 用户索引位置
+	char ch;				// 接收字符输入
+	char **data;			// 接收回传数据
 	char username[30];
 	char password[30];
-	printf("请输入用户名和密码：\n"); 
+	printf("\t\t请输入用户名和密码：\n");
 	printf("\n\t\tusername:");
-	scanf("%s", username); 
+	scanf("%s", username);
 	printf("\n\t\tpassword:");
-	while((ch=getch())!='\r')		// 	接收密码 
+	while((ch=getch())!='\r')		// 	接收密码
 	{
 		if(ch=='\b' && i > 0)
 		{
@@ -228,58 +337,49 @@ bool login(sqlite3 *db,DATABASE *datainfo,USER *p_user)
 			printf("*");
 		}
 	}
-//	p_user->password[i] = '\0';    // 字符串以\0结尾 
 	password[i] = '\0';
 	res = select_user_by_username(db,datainfo,username);
 	switch(res)
 	{
 		case 1:
-			if(datainfo->rowCount > 0) 
+			if(datainfo->rowCount > 0)
 			{
 				res = select_user_by_password(db,datainfo,username,password);   			// 返回操作结果2为找不到密码
 				switch(res)
 				{
 					case 1:
 						data = datainfo->tableData;
-//						if(datainfo->rowCount > 0) 
+//						if(datainfo->rowCount > 0)
 //						{
 //					  		printf("数据表的记录:\n");
 //						    for(int i=0;i<(datainfo->rowCount+1)*datainfo->columnCount;i++)
 //						    {
 //								printf("%-7s   ",datainfo->tableData[i]);
-//								
+//
 //						        if((i+1)%datainfo->columnCount == 0)
 //						        {
 //						            printf("\n");
 //						        }
-//							}   
+//							}
 //						}
 
 						p_user->name = data[11];
+                        printf("\n\t\t登陆成功！欢迎[%s]用户\n",p_user->name);			// 第11个数据为用户姓名
+                        return true;
 
-						system("pause");
-						
-//						if (data[19] == "1")											// 第19个数据为在职在状态 
-//						{			
-							printf("\n\t\t登陆成功！欢迎[%s]用户\n",p_user->name);			// 第11个数据为用户姓名 
-							return true;
-//						}else{
-//							printf("\n\t\t已经离职！无法登录！");
-//							return false;
-//						}
 					case 2:
-						printf("\t\t用户名或者密码输入错误！"); 
+						printf("\t\t用户名或者密码输入错误！");
 						return false;
-				} 
+				}
 			}
 			return true;
 		case 2:
-			printf("\n\t\t用户名或密码输入错误！"); 
-			return false; // 该用户不存在 
+			printf("\n\t\t用户名或密码输入错误！");
+			return false; // 该用户不存在
 	}
 }
 
-// 打印用户数据 
+// 打印用户数据
 void print_user_Info(sqlite3 *db,DATABASE *datainfo)
 {
 	if(datainfo->rowCount > 0)
@@ -297,11 +397,11 @@ void print_user_Info(sqlite3 *db,DATABASE *datainfo)
 		select_all_dprt(db,&dprtdata);        // 查找所有部门
 		dprt = dprtdata.tableData;
 
-		for(int i=0;i < 10;i++)
+		for(int i=0;i < datainfo->columnCount;i++)
 		{
 			data[i] = column_name[i];
 		}
-		printf("\n===============================================================================================================================\n");
+		bound();
 	    for(int i=0;i<(datainfo->rowCount+1)*datainfo->columnCount;i++)
 	    {
 	    	if((i+1)%datainfo->columnCount == 3 && i > 9)
@@ -324,14 +424,14 @@ void print_user_Info(sqlite3 *db,DATABASE *datainfo)
 			printf("%-12s",datainfo->tableData[i]);
 	        if((i+1)%datainfo->columnCount == 0)
 	        {
-	            printf("\n===============================================================================================================================\n");
+	            bound();
 	        }
 		}
 	}
 }
 
 
-// 对当前用户的信息进行赋值 
+// 对用户的信息进行赋值
 void curr_user_info(char **data,USER *p_user)
 {
 	p_user->username = data[10];
@@ -347,106 +447,186 @@ void curr_user_info(char **data,USER *p_user)
 
 
 // 修改用户名
-bool update_username(sqlite3 *db,DATABASE *datainfo,USER *p_user) 
-{	
+bool update_username(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
 	int code;
 	if (alert("用户名"))
 	{
-		printf("\n\t\t请输入用户名：");
-		fflush(stdin);
-		scanf("%s",p_user->username); 
+		input_str("用户名",p_user->username);
 		code = select_user_by_username(db,datainfo,p_user->username);
-		if (code = 2) // 数据库中没有相同用户名 
+		if (code = 2) // 数据库中没有相同用户名
 		{
-			update_user_username(db,datainfo,*p_user); 
-			return true; 
-		} 
+			update_user_username(db,datainfo,*p_user);
+			return true;
+		}
 	}
 	return false;
 }
 
-// 修改姓名 
-bool update_name(sqlite3 *db,DATABASE *datainfo,USER *p_user) 
-{	
+// 修改姓名
+bool update_name(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
 	int code;
 	if (alert("姓名"))
 	{
-		printf("\n\t\t请输入姓名：");
-		fflush(stdin);
-		scanf("%s",p_user->name); 
-		update_user_name(db,datainfo,*p_user); 
+		input_str("姓名",p_user->name);
+		update_user_name(db,datainfo,*p_user);
 		return true;
 	}
 	return false;
 }
 
-// 修改密码 
-bool update_password(sqlite3 *db,DATABASE *datainfo,USER *p_user) 
-{	
+// 修改密码
+bool update_password(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
 	int code,flag=true;
 	char *password;
 	if (alert("密码"))
 	{
-		while(flag)
-		{
-			printf("\n\t\t请输入原密码：");
-			fflush(stdin);
-			scanf("%s",password); 
-			code = select_user_by_password(db,datainfo,p_user->username,password);
-			p_user->password = password; 
-			if (code == 2)
-			{
-				printf("密码输入错误！"); 
-			}else{
-				flag = false;
-			}
-
-		}
-		printf("\n\t\t请输入新密码：");
-		fflush(stdin);
-		scanf("%s",password); 
-		code = update_user_password(db,datainfo,*p_user); 	
+		input_str("新密码",p_user->password);
+		code = update_user_password(db,datainfo,*p_user);
 		if (code)
 		{
-			printf("\n\t\t密码修改成功！"); 
+			printf("\n\t\t密码修改成功！");
 		}
-		p_user->password = password; 
+		p_user->password = password;
 		return true;
 	}
 	return false;
 }
 
-// 修改学历 
-bool update_edu(sqlite3 *db,DATABASE *datainfo,USER *p_user) 
-{	
+// 修改权限
+bool update_role(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
+    int code;
+	if (alert("权限"))
+	{
+        for(int i = 0;i < 3;i++)
+			printf("\t\t%d--%s\n",i,role[i]);
+ 		printf("\n\t\t请输入要修改权限：");
+		fflush(stdin);
+		scanf("%d",&p_user->role_id);
+		update_user_role(db,datainfo,*p_user);
+		return true;
+	}
+	return false;
+}
+// 修改性别
+bool update_sex(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
+    int code;
+	if (alert("性别"))
+	{
+		fflush(stdin);
+		if (p_user->role_id == 1) p_user->role_id = 0;
+		else p_user->role_id = 1;
+		update_user_sex(db,datainfo,*p_user);
+		return true;
+	}
+	return false;
+}
+
+// 调离部门
+bool update_dprt(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
+	int code;
+    char **dprt;
+    select_all_dprt(db,datainfo);        // 查找所有部门
+    dprt = datainfo->tableData;
+	if (alert("部门 "))
+	{
+        for(int i = datainfo->columnCount;i < (datainfo->rowCount+1)*datainfo->columnCount;i+=2) // 从数据库中提取数据获得部门列表
+        {
+            printf("\t\t%d--%s\n",i/2,dprt[i+1]);
+        }
+		input_int("部门",p_user->department_id);
+		update_user_dprt(db,datainfo,*p_user);
+		return true;
+	}
+	return false;
+}
+
+// 修改学历
+bool update_edu(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
 	int code;
 	if (alert("学历 "))
 	{
-		printf("\n\t\t请输入学历：");
-		fflush(stdin);
-		scanf("%d",&p_user->education); 
-		update_user_edu(db,datainfo,*p_user); 
+        for(int i = 0;i < 10;i++)
+            printf("\t\t%d--%s\n",i,education[i]);
+		input_int("学历",p_user->education);
+		update_user_edu(db,datainfo,*p_user);
 		return true;
 	}
 	return false;
 }
 
-// 修改电话 
-bool update_mobile(sqlite3 *db,DATABASE *datainfo,USER *p_user) 
-{	
+// 修改员工号
+bool update_staffId(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
+	int code;
+	char *new_staffId=(char *)malloc(20);
+	if (alert("员工号"))
+	{
+        input_str("员工号",new_staffId);
+        while(select_user_by_staffId(db,datainfo,new_staffId) != 2)
+        {
+            printf("\t\t员工号已经存在请重新输入\n");
+            input_str("员工号",new_staffId);
+        }
+		update_user_staffId(db,datainfo,*p_user,new_staffId);
+		strcpy(p_user->staff_id,new_staffId);
+		free(new_staffId);
+		return true;
+	}
+	free(new_staffId);
+	return false;
+}
+
+// 修改电话
+bool update_mobile(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
 	int code;
 	if (alert("电话 "))
 	{
-		printf("\n\t\t请输入电话：");
-		fflush(stdin);
-		scanf("%s",p_user->mobile); 
-		update_user_mobile(db,datainfo,*p_user); 
+		input_str("电话",p_user->mobile);
+		update_user_mobile(db,datainfo,*p_user);
 		return true;
 	}
 	return false;
 }
- 
-// 询问是否修改信息，字符串类型 
+
+// 修改在职状态
+bool update_status(sqlite3 *db,DATABASE *datainfo,USER *p_user)
+{
+    int code;
+    char ch;
+	if (alert("在职状态"))
+	{
+		if (p_user->status == 1)
+        {
+            printf("\t\t是否调离该员工？(Y/N)");
+            fflush(stdin);
+            scanf("%c",&ch);
+            if (ch == 'y' || ch == 'Y')
+            {
+                p_user->status = -1;
+            }
+        }else{
+            printf("\t\t是否允许员工入职？(Y/N)");
+            fflush(stdin);
+            scanf("%c",&ch);
+            if (ch == 'y' || ch == 'Y')
+            {
+                p_user->status = 1;
+            }
+        }
+		update_user_status(db,datainfo,*p_user);
+		return true;
+	}
+	return false;
+}
+// 询问是否修改信息，字符串类型
 int alert(char *info)
 {
 	char ch;
@@ -459,25 +639,24 @@ int alert(char *info)
 	}
 	return 0;
 }
-// 输入整型变量
-int input_int(char *info,int &data)
-{
-	printf("\t\t请输入%s：",info);
-	fflush(stdin);
-	scanf("%d",&data);
-	printf("%d\n",data);
-	return 1;
-}
 
-// 输入字符型变量
-int input_str(char *info,char *data)
-{
-	printf("\t\t请输入%s：",info);
-	fflush(stdin);
-	scanf("%s",data);
-	printf("%s\n",data);
-	return 1;
-}
+//// 输入整型变量
+//int input_int(char *info,int &data)
+//{
+//	printf("\t\t请输入%s：",info);
+//	fflush(stdin);
+//	scanf("%d",&data);
+//	return 1;
+//}
+//
+//// 输入字符型变量
+//int input_str(char *info,char *data)
+//{
+//	printf("\t\t请输入%s：",info);
+//	fflush(stdin);
+//	scanf("%s",data);
+//	return 1;
+//}
 
 // 给结构体的字符指针开辟内存
 void malloc_user(USER *user)
@@ -501,5 +680,8 @@ void free_user(USER *user)
     free(user);
 }
 
-
+void bound()
+{
+    printf("\n===============================================================================================================================\n");
+}
 

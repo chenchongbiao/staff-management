@@ -10,5 +10,5 @@ void staff_manage_menu();			// 员工管理
 void depart_manage_menu();			// 部门管理
 void total_menu();  				// 员工查询统计 
 void total_staff();   				// 员工统计 
-
+void delete_database();				// 删除数据库 
 #endif
